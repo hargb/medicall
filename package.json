@@ -1,5 +1,5 @@
 {
-  "homepage": "https://hargb.github.io/medicall",
+  "homepage": "https://hargb.github.io/medicall/",
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
@@ -7,7 +7,7 @@
   "scripts": {
     
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
