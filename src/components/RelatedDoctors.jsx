@@ -1,71 +1,428 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from "react";
+import { AppContext } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
 
 const RelatedDoctors = ({ speciality, docId }) => {
   const { doctors } = useContext(AppContext);
   const navigate = useNavigate();
-  const [relDoc, setRelDocs] = useState([]);
+
+  const [relatedDoctors, setRelatedDoctors] = useState([]);
 
   useEffect(() => {
-    if (doctors.length > 0 && speciality) {
-      const doctorsData = doctors.filter(
-        (doc) => doc.speciality === speciality && doc._id !== docId
+    if (doctors?.length > 0 && speciality) {
+      const filteredDoctors = doctors.filter(
+        (doc) =>
+          doc.speciality === speciality &&
+          doc._id !== docId
       );
-      setRelDocs(doctorsData);
+
+      setRelatedDoctors(filteredDoctors);
+    } else {
+      setRelatedDoctors([]);
     }
   }, [doctors, speciality, docId]);
 
+  const handleDoctorClick = (id) => {
+    if (!id) return;
+
+    navigate(`/appointment/${id}`);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleViewAll = () => {
+    navigate("/Doctors");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
-    <div>
-      <div className="flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10">
-        <h1 className="text-3xl font-medium">Top Doctors to Back</h1>
-        <p className="sm:w-1/3 text-center text-sm">
-          Simply browse through our extensive list of trusted doctors.
-        </p>
-        <div className="w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0">
-          {relDoc.length > 0 ? (
-            relDoc.slice(0, 5).map((item, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  if (item._id) {
-                    navigate(`/appointment/${item._id}`); scrollTo(0,0)
-                  }
-                }}
-                className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-2 
-                transition-all duration-500"
+    <section className="mt-20 sm:mt-24">
+
+      <div className="max-w-[1280px] mx-auto">
+
+        {/* =====================================================
+            SECTION HEADER
+        ====================================================== */}
+
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-8">
+
+          <div>
+
+            <div className="flex items-center gap-2 mb-3">
+
+              <span className="w-7 h-[2px] bg-blue-600 rounded-full" />
+
+              <span
+                className="text-[10px]
+                uppercase
+                tracking-[0.18em]
+                font-bold
+                text-blue-600"
               >
-                <img
-                  className="bg-blue-50"
-                  src={item.image}
-                  alt={`${item.name} profile`}
-                />
-                <div className="p-4">
-                  <div className="flex items-center gap-2 text-sm text-center text-green-500">
-                    <p className="w-2 h-2 bg-green-500 rounded-full"></p>
-                    <p>Available</p>
-                  </div>
-                  <p className="text-gray-900 text-lg font-medium">{item.name}</p>
-                  <p className="text-gray-600 text-sm">{item.speciality}</p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No related doctors found.</p>
-          )}
+                Similar specialists
+              </span>
+
+            </div>
+
+            <h2
+              className="text-2xl
+              sm:text-3xl
+              font-bold
+              text-slate-900
+              tracking-tight"
+            >
+              More doctors you can consult
+            </h2>
+
+            <p
+              className="text-sm
+              text-slate-500
+              mt-2
+              max-w-xl
+              leading-6"
+            >
+              Explore other doctors from the same speciality and
+              choose a professional that fits your healthcare needs.
+            </p>
+
+          </div>
+
+          {/* View all */}
+
+          <button
+            onClick={handleViewAll}
+            className="self-start sm:self-auto
+            text-sm
+            font-semibold
+            text-blue-600
+            hover:text-blue-700
+            transition-colors
+            whitespace-nowrap"
+          >
+            View all doctors →
+          </button>
+
         </div>
-        <button
-          onClick={() => {
-            navigate("/doctors");
-            window.scrollTo(0, 0);
-          }}
-          className="bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10"
-        >
-          more
-        </button>
+
+        {/* =====================================================
+            DOCTOR CARDS
+        ====================================================== */}
+
+        {relatedDoctors.length > 0 ? (
+
+          <div
+            className="grid
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-5
+            gap-5"
+          >
+
+            {relatedDoctors.slice(0, 5).map((doctor) => (
+
+              <article
+                key={doctor._id}
+                onClick={() => handleDoctorClick(doctor._id)}
+                className="group
+                bg-white
+                rounded-3xl
+                overflow-hidden
+                border
+                border-slate-100
+                cursor-pointer
+                hover:border-blue-100
+                hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]
+                hover:-translate-y-1
+                transition-all
+                duration-300"
+              >
+
+                {/* =================================================
+                    DOCTOR IMAGE
+                ================================================== */}
+
+                <div
+                  className="relative
+                  bg-blue-50
+                  overflow-hidden"
+                >
+
+                  <img
+                    src={doctor.image}
+                    alt={`${doctor.name} profile`}
+                    className="w-full
+                    aspect-[4/4.8]
+                    object-cover
+                    group-hover:scale-105
+                    transition-transform
+                    duration-500"
+                  />
+
+                  {/* Available badge */}
+
+                  <div
+                    className="absolute
+                    top-3
+                    left-3
+                    flex
+                    items-center
+                    gap-1.5
+                    bg-white/95
+                    backdrop-blur-sm
+                    rounded-full
+                    px-3
+                    py-1.5
+                    shadow-sm"
+                  >
+
+                    <span
+                      className="w-2
+                      h-2
+                      rounded-full
+                      bg-emerald-500"
+                    />
+
+                    <span
+                      className="text-[10px]
+                      font-semibold
+                      text-slate-600"
+                    >
+                      Available
+                    </span>
+
+                  </div>
+
+                  {/* Favourite */}
+
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="Add doctor to favourites"
+                    className="absolute
+                    top-3
+                    right-3
+                    w-8
+                    h-8
+                    rounded-full
+                    bg-white/95
+                    backdrop-blur-sm
+                    flex
+                    items-center
+                    justify-center
+                    text-lg
+                    text-slate-400
+                    hover:text-red-500
+                    hover:scale-105
+                    transition-all
+                    shadow-sm"
+                  >
+                    ♡
+                  </button>
+
+                </div>
+
+                {/* =================================================
+                    DOCTOR INFORMATION
+                ================================================== */}
+
+                <div className="p-4">
+
+                  {/* Name */}
+
+                  <div className="flex items-center gap-1.5">
+
+                    <h3
+                      className="text-base
+                      font-bold
+                      text-slate-900
+                      truncate"
+                    >
+                      {doctor.name}
+                    </h3>
+
+                    {/* Verified */}
+
+                    <span
+                      className="flex-shrink-0
+                      w-4
+                      h-4
+                      rounded-full
+                      bg-blue-50
+                      text-blue-600
+                      flex
+                      items-center
+                      justify-center
+                      text-[9px]
+                      font-bold"
+                    >
+                      ✓
+                    </span>
+
+                  </div>
+
+                  {/* Speciality */}
+
+                  <p
+                    className="text-xs
+                    text-slate-500
+                    mt-1
+                    truncate"
+                  >
+                    {doctor.speciality}
+                  </p>
+
+                  {/* Rating */}
+
+                  <div
+                    className="flex
+                    items-center
+                    justify-between
+                    mt-4
+                    pt-3
+                    border-t
+                    border-slate-100"
+                  >
+
+                    <div className="flex items-center gap-1">
+
+                      <span className="text-amber-400 text-sm">
+                        ★
+                      </span>
+
+                      <span
+                        className="text-xs
+                        font-semibold
+                        text-slate-700"
+                      >
+                        4.8
+                      </span>
+
+                    </div>
+
+                    <span
+                      className="text-[10px]
+                      text-slate-400"
+                    >
+                      View profile
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </article>
+
+            ))}
+
+          </div>
+
+        ) : (
+
+          /* =====================================================
+              EMPTY STATE
+          ====================================================== */
+
+          <div
+            className="rounded-3xl
+            border
+            border-slate-100
+            bg-slate-50
+            py-12
+            px-5
+            text-center"
+          >
+
+            <div
+              className="w-12
+              h-12
+              mx-auto
+              rounded-2xl
+              bg-white
+              border
+              border-slate-100
+              flex
+              items-center
+              justify-center
+              text-xl"
+            >
+              🩺
+            </div>
+
+            <h3
+              className="mt-4
+              text-base
+              font-semibold
+              text-slate-800"
+            >
+              No related doctors found
+            </h3>
+
+            <p
+              className="mt-1
+              text-sm
+              text-slate-500"
+            >
+              Explore our complete list of doctors instead.
+            </p>
+
+            <button
+              onClick={handleViewAll}
+              className="mt-5
+              px-5
+              py-2.5
+              rounded-xl
+              bg-blue-600
+              text-white
+              text-xs
+              font-semibold
+              hover:bg-blue-700
+              transition-colors"
+            >
+              Browse all doctors
+            </button>
+
+          </div>
+
+        )}
+
+        {/* =====================================================
+            BOTTOM CTA
+        ====================================================== */}
+
+        {relatedDoctors.length > 5 && (
+
+          <div className="flex justify-center mt-8">
+
+            <button
+              onClick={handleViewAll}
+              className="px-7
+              py-3
+              rounded-full
+              bg-slate-100
+              text-slate-700
+              text-sm
+              font-semibold
+              hover:bg-blue-50
+              hover:text-blue-600
+              transition-all"
+            >
+              Explore more doctors →
+            </button>
+
+          </div>
+
+        )}
+
       </div>
-    </div>
+
+    </section>
   );
 };
 
